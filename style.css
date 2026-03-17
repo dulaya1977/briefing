@@ -8,9 +8,10 @@ body {
 }
 
 nav {
-    background: #004080; /* 深藍色導覽列 */
+    background: #334155; /* Slate 沉穩深灰藍 */
     color: #fff;
     padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 nav ul {
