@@ -108,7 +108,7 @@
         // 頁面載入時讀取 JSON 題庫
         window.onload = async () => {
             try {
-                const response = await fetch('harassment.json');
+                const response = await fetch('./harassment.json');
                 allQuestions = await response.json();
             } catch (error) {
                 console.error("Failed to load questions", error);
