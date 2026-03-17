@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Ship Briefing</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        /* Quiz 專屬科技感樣式 */
+        .quiz-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #004080; }
+        .form-group input { 
+            width: 100%; padding: 12px; border: 1px solid #ccc; 
+            border-radius: 6px; box-sizing: border-box; font-size: 16px;
+        }
+        .btn {
+            background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white; border: none; padding: 12px 24px; font-size: 16px;
+            border-radius: 6px; cursor: pointer; transition: 0.3s;
+            display: block; width: 100%; font-weight: bold;
+        }
+        .btn:hover { opacity: 0.9; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
+        
+        .question-block { margin-bottom: 30px; display: none; }
+        .question-text { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: #333; }
+        .options-list { list-style: none; padding: 0; }
+        .option-item {
+            background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px;
+            margin-bottom: 10px; border-radius: 6px; cursor: pointer; transition: 0.2s;
+        }
+        .option-item:hover { background: #e0f2fe; border-color: #7dd3fc; }
+        .option-item input { margin-right: 10px; }
+        
+        #result-screen { display: none; text-align: center; }
+        .score-display { font-size: 3rem; color: #004080; font-weight: bold; margin: 20px 0; }
+        
+        /* 隱藏/顯示控制 */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Harassment</a></li>
+            <li><a href="stevedore.html">Stevedore</a></li>
+            <li><a href="quiz.html" class="quiz-btn">Quiz</a></li>
+        </ul>
+    </nav>
+    
+    <main>
+        <div class="quiz-container">
+            <div id="info-screen">
+                <h1 style="color: #004080; text-align: center;">Harassment Policy Quiz</h1>
+                <p style="text-align: center; color: #666; margin-bottom: 30px;">Please enter your details to start the assessment.</p>
+                
+                <div class="form-group">
+                    <label>Vessel Name</label>
+                    <input type="text" id="vesselName" required placeholder="e.g. MV Wisdom">
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="userName" required placeholder="e.g. John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Rank</label>
+                    <input type="text" id="userRank" required placeholder="e.g. Chief Officer">
+                </div>
+                <div class="form-group">
+                    <label>Email Address (To receive results)</label>
+                    <input type="email" id="userEmail" required placeholder="your.email@example.com">
+                </div>
+                <button class="btn" onclick="startQuiz()">Start Quiz</button>
+            </div>
+
+            <div id="quiz-screen" class="hidden">
+                <div id="quiz-content"></div>
+                <button class="btn" onclick="submitQuiz()" style="margin-top: 20px;">Submit Answers</button>
+            </div>
+
+            <div id="result-screen" class="hidden">
+                <h1>Assessment Completed</h1>
+                <div class="score-display">Score: <span id="final-score">0</span>%</div>
+                <p>Your results and answer review have been sent to your email.</p>
+                <p style="font-size: 0.9em; color: #666;">(CC: kenneth_lin@wisdomlines.com.tw)</p>
+                <button class="btn" onclick="location.reload()" style="margin-top: 30px; width: auto; padding: 10px 30px; margin: 20px auto;">Retake Quiz</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ⭐ 請替換成您在 EmailJS 註冊取得的 Public Key
+        emailjs.init("qYyv1wPLZyzF3V2Il"); 
+
+        let allQuestions = [];
+        let selectedQuestions = [];
+        let userAnswers = {};
+        let userInfo = {};
+
+        // 頁面載入時讀取 JSON 題庫
+        window.onload = async () => {
+            try {
+                const response = await fetch('harassment.json');
+                allQuestions = await response.json();
+            } catch (error) {
+                console.error("Failed to load questions", error);
+                alert("Error loading quiz data. Please make sure harassment.json is in the correct location.");
+            }
+        };
+
+        // 開始測驗
+        function startQuiz() {
+            // 收集並驗證資料
+            userInfo = {
+                vessel: document.getElementById('vesselName').value.trim(),
+                name: document.getElementById('userName').value.trim(),
+                rank: document.getElementById('userRank').value.trim(),
+                email: document.getElementById('userEmail').value.trim()
+            };
+
+            if(!userInfo.vessel || !userInfo.name || !userInfo.rank || !userInfo.email) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            // 隨機選出 10 題
+            selectedQuestions = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 10);
+            renderQuiz();
+
+            document.getElementById('info-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+        }
+
+        // 渲染題目
+        function renderQuiz() {
+            const container = document.getElementById('quiz-content');
+            container.innerHTML = '';
+
+            selectedQuestions.forEach((q, index) => {
+                const block = document.createElement('div');
+                block.className = 'question-block';
+                block.style.display = 'block';
+
+                let optionsHtml = '';
+                q.options.forEach((opt, optIndex) => {
+                    optionsHtml += `
+                        <label class="option-item">
+                            <input type="radio" name="q${index}" value="${optIndex}">
+                            ${opt.en} <br><small style="color:#666; margin-left: 25px;">${opt['zh-CN']}</small>
+                        </label>
+                    `;
+                });
+
+                block.innerHTML = `
+                    <div class="question-text">${index + 1}. ${q.question.en} <br><small style="color:#666;">${q.question['zh-CN']}</small></div>
+                    <div class="options-list">${optionsHtml}</div>
+                `;
+                container.appendChild(block);
+            });
+        }
+
+        // 提交測驗與寄信
+        function submitQuiz() {
+            let score = 0;
+            let reviewText = ""; // 整理寄給使用者的檢討內容
+
+            // 檢查是否全答並計分
+            for (let i = 0; i < selectedQuestions.length; i++) {
+                const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
+                if (!selectedOption) {
+                    alert(`Please answer question ${i + 1}`);
+                    return;
+                }
+                
+                const answerIndex = parseInt(selectedOption.value);
+                const q = selectedQuestions[i];
+                const isCorrect = answerIndex === q.correct_answer_index;
+                
+                if (isCorrect) score += 10;
+
+                // 組合檢討文字
+                reviewText += `Q${i+1}: ${q.question.en}\n`;
+                reviewText += `Your Answer: ${q.options[answerIndex].en}\n`;
+                if (!isCorrect) {
+                    reviewText += `Correct Answer: ${q.options[q.correct_answer_index].en}\n`;
+                }
+                reviewText += `Result: ${isCorrect ? "✅ Correct" : "❌ Incorrect"}\n\n`;
+            }
+
+            // 切換到結果畫面
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+
+            // 呼叫 EmailJS 發信
+            const templateParams = {
+                user_name: userInfo.name,
+                user_email: userInfo.email,
+                vessel_name: userInfo.vessel,
+                rank: userInfo.rank,
+                score: score,
+                review_content: reviewText
+            };
+
+            // ⭐ 請替換成您在 EmailJS 取得的 Service ID 和 Template ID
+            emailjs.send('service_87bqiaf', 'template_9lvl93', templateParams)
+                .then(function(response) {
+                   console.log('SUCCESS!', response.status, response.text);
+                }, function(error) {
+                   console.error('FAILED...', error);
+                   alert("Quiz submitted, but there was an error sending the email.");
+                });
+        }
+    </script>
+</body>
+</html>
