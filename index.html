@@ -1,137 +1,43 @@
-<style>
-      /* 全局設定：鎖定整個網頁高度，禁止外層捲動 */
-      body {
-        font-family: 'Roboto', sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #ffffff;
-        height: 100vh; /* 高度等於整個視窗 */
-        overflow: hidden; /* 隱藏最外層的捲軸 */
-        display: flex;
-        flex-direction: column; /* 讓內容由上往下排 */
-      }
-
-      /* 頂部區域 (固定在上方) */
-      .top-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px; /* 將原本 body 的內邊距移到這裡 */
-        background-color: #ffffff;
-        z-index: 10; /* 確保它疊在最上層 */
-      }
-
-      h1 {
-        font-size: 24px;
-        font-weight: bold;
-        margin: 0;
-        color: #000;
-      }
-
-      /* 搜尋框樣式 */
-      .search-container {
-        position: relative;
-      }
-      
-      .search-input {
-        padding: 8px 10px 8px 30px;
-        width: 350px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
-        height: 20px;
-      }
-      
-      .search-icon {
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #888;
-        font-size: 14px;
-        pointer-events: none;
-      }
-
-      /* 表格容器：自動填滿剩餘高度，並只在這裡產生捲軸 */
-      .table-container {
-        width: 100%;
-        flex-grow: 1; /* 自動填滿 top-bar 以外的所有剩餘空間 */
-        overflow-y: auto; /* 允許垂直捲動 */
-        padding: 0 20px 20px 20px; /* 設定左右下的邊距 */
-        box-sizing: border-box;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-      }
-
-      /* 固定標題列 (Sticky Header) */
-      thead th {
-        position: sticky;
-        top: 0;
-        background-color: #e0e0e0;
-        color: #333;
-        z-index: 2; /* 確保表頭疊在表格內容之上 */
-        padding: 12px 10px;
-        text-align: left;
-        font-weight: 500;
-        font-size: 14px;
-      }
-
-      thead th.center-align {
-        text-align: center;
-      }
-
-      tbody td {
-        padding: 12px 10px;
-        border-bottom: 1px solid #f0f0f0;
-        font-size: 14px;
-        color: #333;
-        vertical-align: middle;
-        word-wrap: break-word;
-      }
-      
-      tbody tr:hover {
-        background-color: #f9f9f9;
-      }
-
-      .col-num { width: 15%; }
-      .col-title { width: 30%; }
-      .col-ver { width: 8%; }
-      .col-date { width: 12%; }
-      .col-pic { width: 10%; }
-      .col-action { width: 12.5%; text-align: center; }
-
-      .btn {
-        padding: 6px 15px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 13px;
-        text-decoration: none;
-        display: inline-block;
-        color: #000;
-        font-weight: 500;
-        min-width: 60px;
-        text-align: center;
-      }
-
-      .btn-active { background-color: #81d4fa; }
-      .btn-active:hover { background-color: #4fc3f7; }
-
-      .btn-nil {
-        background-color: #e0e0e0;
-        color: #757575;
-        cursor: default;
-        pointer-events: none;
-      }
-
-      .loading {
-        text-align: center;
-        padding: 40px;
-        color: #666;
-        font-size: 16px;
-      }
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harassment - Ship Briefing</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        nav {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 1000 !important;
+        }
     </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Harassment</a></li>
+            <li><a href="stevedore.html">Stevedore</a></li>
+        </ul>
+    </nav>
+    
+    <main>
+        <h1>Briefing Video - Harassment & Violence Prevention Policy</h1>
+        
+        <div class="video-section">
+            <h2>Briefing in English</h2>
+            <iframe src="https://drive.google.com/file/d/1Tuw9Pfeq4pYODzPj5mnDmH-4LhApSG3L/preview" width="560" height="315" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        </div>
+
+        <div class="video-section">
+            <h2>Briefing in Chinese</h2>
+            <iframe src="https://drive.google.com/file/d/1nYRq8XsEIKoG-oVqPWZWc-wD8-yaoLqj/preview" width="560" height="315" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        </div>
+
+        <div class="video-section">
+            <h2>Briefing in Vietnamese</h2>
+            <iframe src="https://drive.google.com/file/d/15Qzz-RWTc0_uphSEJMPVBQjhfcp_QCAq/preview" width="560" height="315" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        </div>
+    </main>
+</body>
+</html>
