@@ -30,16 +30,69 @@
         }
         .btn:hover { opacity: 0.9; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
         
-        .question-block { margin-bottom: 30px; display: none; }
-        .question-text { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: #333; }
-        .options-list { list-style: none; padding: 0; }
-        .option-item {
-            background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px;
-            margin-bottom: 10px; border-radius: 6px; cursor: pointer; transition: 0.2s;
+        /* 題目與選項排版優化 */
+        .question-block { 
+            margin-bottom: 40px; 
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
         }
-        .option-item:hover { background: #e0f2fe; border-color: #7dd3fc; }
-        .option-item input { margin-right: 10px; }
-        
+        .question-text { 
+            font-size: 1.15rem; 
+            font-weight: bold; 
+            margin-bottom: 20px; 
+            color: #1e3a8a; 
+            line-height: 1.5;
+        }
+        /* 題目的次要語言 */
+        .lang-sub-q {
+            display: block;
+            font-size: 0.95rem;
+            color: #555;
+            font-weight: normal;
+            margin-top: 4px;
+        }
+
+        .options-list { 
+            display: flex;
+            flex-direction: column; /* 強制垂直排列 */
+            gap: 12px; /* 選項之間的間距 */
+        }
+        .option-item {
+            display: flex; /* 使用 flexbox 讓圓圈和文字對齊 */
+            align-items: flex-start;
+            background: #f8fafc; 
+            border: 1px solid #e2e8f0; 
+            padding: 16px;
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: 0.2s;
+        }
+        .option-item:hover { 
+            background: #e0f2fe; 
+            border-color: #7dd3fc; 
+        }
+        .option-item input[type="radio"] { 
+            margin-top: 5px; /* 稍微往下移對齊第一行英文字 */
+            margin-right: 15px; 
+            transform: scale(1.2); /* 讓點選圓圈大一點 */
+            cursor: pointer;
+        }
+        .option-text-container {
+            display: flex;
+            flex-direction: column; /* 選項內的三種語言垂直排列 */
+            gap: 4px;
+        }
+        .lang-en {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.05rem;
+        }
+        /* 選項的次要語言 */
+        .lang-sub-opt {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
         #result-screen { display: none; text-align: center; }
         .score-display { font-size: 3rem; color: #004080; font-weight: bold; margin: 20px 0; }
         
@@ -98,11 +151,10 @@
 
     <script>
         // ⭐ 請替換成您在 EmailJS 註冊取得的 Public Key
-        emailjs.init("qYyv1wPLZyzF3V2Il"); 
+        emailjs.init("YOUR_PUBLIC_KEY"); 
 
         let allQuestions = [];
         let selectedQuestions = [];
-        let userAnswers = {};
         let userInfo = {};
 
         // 頁面載入時讀取 JSON 題庫
@@ -112,13 +164,12 @@
                 allQuestions = await response.json();
             } catch (error) {
                 console.error("Failed to load questions", error);
-                alert("Error loading quiz data. Please make sure harassment.json is in the correct location.");
+                alert("Error loading quiz data. Please make sure harassment.json is in the correct location and format.");
             }
         };
 
         // 開始測驗
         function startQuiz() {
-            // 收集並驗證資料
             userInfo = {
                 vessel: document.getElementById('vesselName').value.trim(),
                 name: document.getElementById('userName').value.trim(),
@@ -139,7 +190,7 @@
             document.getElementById('quiz-screen').classList.remove('hidden');
         }
 
-        // 渲染題目
+        // 渲染題目 (更新了三種語言的排版)
         function renderQuiz() {
             const container = document.getElementById('quiz-content');
             container.innerHTML = '';
@@ -147,21 +198,30 @@
             selectedQuestions.forEach((q, index) => {
                 const block = document.createElement('div');
                 block.className = 'question-block';
-                block.style.display = 'block';
 
                 let optionsHtml = '';
                 q.options.forEach((opt, optIndex) => {
                     optionsHtml += `
                         <label class="option-item">
                             <input type="radio" name="q${index}" value="${optIndex}">
-                            ${opt.en} <br><small style="color:#666; margin-left: 25px;">${opt['zh-CN']}</small>
+                            <div class="option-text-container">
+                                <span class="lang-en">${opt.en}</span>
+                                <span class="lang-sub-opt">${opt['zh-CN']}</span>
+                                <span class="lang-sub-opt">${opt['vi']}</span>
+                            </div>
                         </label>
                     `;
                 });
 
                 block.innerHTML = `
-                    <div class="question-text">${index + 1}. ${q.question.en} <br><small style="color:#666;">${q.question['zh-CN']}</small></div>
-                    <div class="options-list">${optionsHtml}</div>
+                    <div class="question-text">
+                        ${index + 1}. ${q.question.en}
+                        <span class="lang-sub-q">${q.question['zh-CN']}</span>
+                        <span class="lang-sub-q">${q.question['vi']}</span>
+                    </div>
+                    <div class="options-list">
+                        ${optionsHtml}
+                    </div>
                 `;
                 container.appendChild(block);
             });
@@ -170,7 +230,7 @@
         // 提交測驗與寄信
         function submitQuiz() {
             let score = 0;
-            let reviewText = ""; // 整理寄給使用者的檢討內容
+            let reviewText = ""; 
 
             // 檢查是否全答並計分
             for (let i = 0; i < selectedQuestions.length; i++) {
@@ -186,7 +246,6 @@
                 
                 if (isCorrect) score += 10;
 
-                // 組合檢討文字
                 reviewText += `Q${i+1}: ${q.question.en}\n`;
                 reviewText += `Your Answer: ${q.options[answerIndex].en}\n`;
                 if (!isCorrect) {
@@ -210,8 +269,8 @@
                 review_content: reviewText
             };
 
-            // ⭐ 請替換成您在 EmailJS 取得的 Service ID 和 Template ID
-            emailjs.send('service_87bqiaf', 'template_9lvl93', templateParams)
+            // ⭐ 記得替換成您自己的 Service ID 和 Template ID 才能真正寄信喔！
+            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
                 .then(function(response) {
                    console.log('SUCCESS!', response.status, response.text);
                 }, function(error) {
