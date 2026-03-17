@@ -156,7 +156,7 @@
 
     <script>
         // ⭐ 請替換成您在 EmailJS 註冊取得的 Public Key
-        emailjs.init("YOUR_PUBLIC_KEY"); 
+        emailjs.init("qYyv1wPLZyzF3V2Il"); 
 
         let allQuestions = [];
         let selectedQuestions = [];
@@ -275,7 +275,7 @@
             };
 
             // ⭐ 記得替換成您自己的 Service ID 和 Template ID 才能真正寄信喔！
-            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+            emailjs.send('service_87bqiaf', 'template_9lvl93j', templateParams)
                 .then(function(response) {
                    console.log('SUCCESS!', response.status, response.text);
                 }, function(error) {
