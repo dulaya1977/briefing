@@ -95,7 +95,12 @@
 
         #result-screen { display: none; text-align: center; }
         .score-display { font-size: 3rem; color: #004080; font-weight: bold; margin: 20px 0; }
-        
+        /* 固定頂部導覽列 */
+        nav {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 1000 !important;
+        }
         /* 隱藏/顯示控制 */
         .hidden { display: none !important; }
     </style>
