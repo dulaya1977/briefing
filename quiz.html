@@ -171,28 +171,21 @@
             };
 
             try {
-                // 修改 1：加入 mode: 'no-cors'，告訴瀏覽器不要管跨域回傳的問題
-                await fetch(GAS_URL, {
+                const response = await fetch(GAS_URL, {
                     method: 'POST',
-                    mode: 'no-cors', 
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
                     body: JSON.stringify(payload)
                 });
+                const result = await response.json();
                 
-                // 修改 2：因為 no-cors 模式無法讀取回傳結果 (會變成 opaque 回應)，
-                // 我們假設只要 fetch 沒有報錯，就是成功送出了。
-                // 為了讓使用者體驗更好，我們加上一個短暫的延遲，模擬伺服器處理時間
-                setTimeout(() => {
+                if(result.status === 'success') {
                     document.getElementById('loading-screen').classList.add('hidden');
                     document.getElementById('result-screen').classList.remove('hidden');
-                }, 1500); // 等待 1.5 秒後顯示結果畫面
-
+                } else {
+                    throw new Error(result.message);
+                }
             } catch (error) {
-                // 只有在網路完全斷線，或網址根本連不上的情況下，才會走到這裡
                 console.error("Submission failed:", error);
-                alert("Network error. Failed to submit score. Please check your connection.");
+                alert("Failed to submit score. Please try again or contact administrator.");
                 document.getElementById('loading-screen').classList.add('hidden');
                 document.getElementById('quiz-screen').classList.remove('hidden');
             }
